@@ -12,6 +12,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import SignButtons from '../components/SignButtons';
 import SignInForm from '../components/SignInForm';
 import {signIn, signUp} from '../lib/auth';
+import {getUser} from '../lib/users';
 
 const SignInScreen = ({navigation, route}) => {
   const {isSignUp} = route.params || {};
@@ -29,15 +30,24 @@ const SignInScreen = ({navigation, route}) => {
   const onSubmit = async () => {
     Keyboard.dismiss();
     const {email, password, confirmPassword} = form;
+
     if (isSignUp && password !== confirmPassword) {
       Alert.alert('실패', '비밀번호가 일치하지 않습니다.');
+      console.log({password, confirmPassword});
       return;
     }
-    const info = {email, password};
+
     setLoading(true);
+    const info = {email, password};
+
     try {
       const {user} = isSignUp ? await signUp(info) : await signIn(info);
-      console.log(user);
+      const profile = await getUser(user.uid);
+      if (!profile) {
+        navigation.navigate('Welcome', {uid: user.uid});
+      } else {
+        //구현예정
+      }
     } catch (e) {
       const messages = {
         'auth/email-already-in-use': '이미 가입된 이메일입니다.',
