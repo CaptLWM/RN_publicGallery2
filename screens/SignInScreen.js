@@ -13,6 +13,7 @@ import SignButtons from '../components/SignButtons';
 import SignInForm from '../components/SignInForm';
 import {signIn, signUp} from '../lib/auth';
 import {getUser} from '../lib/users';
+import {useUserContext} from '../contexts/UserContext';
 
 const SignInScreen = ({navigation, route}) => {
   const {isSignUp} = route.params || {};
@@ -22,6 +23,7 @@ const SignInScreen = ({navigation, route}) => {
     confirmPassword: '',
   });
   const [loading, setLoading] = useState();
+  const {setUser} = useUserContext();
 
   const createChangeTextHandler = name => value => {
     setForm({...form, [name]: value});
@@ -46,7 +48,7 @@ const SignInScreen = ({navigation, route}) => {
       if (!profile) {
         navigation.navigate('Welcome', {uid: user.uid});
       } else {
-        //구현예정
+        setUser(profile);
       }
     } catch (e) {
       const messages = {

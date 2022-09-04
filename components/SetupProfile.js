@@ -1,6 +1,7 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
+import {useUserContext} from '../contexts/UserContext';
 import {signOut} from '../lib/auth';
 import {createUser} from '../lib/users';
 import BorderedInput from './BorderedInput';
@@ -10,16 +11,19 @@ const SetupProfile = () => {
   const [displayName, setDisplayName] = React.useState();
   console.log(displayName, '????');
   const navigation = useNavigation();
+  const {setUser} = useUserContext();
 
   const {params} = useRoute();
   const {uid} = params || {};
 
   const onSubmit = () => {
-    createUser({
+    const user = {
       id: uid,
       displayName,
       photoURL: null,
-    });
+    };
+    createUser(user);
+    setUser(user);
   };
 
   const onCancel = () => {
