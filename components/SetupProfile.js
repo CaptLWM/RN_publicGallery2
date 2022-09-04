@@ -1,12 +1,20 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
-import React from 'react';
-import {Image, Platform, Pressable, StyleSheet, View} from 'react-native';
+import React, {useState} from 'react';
+import {
+  ActivityIndicator,
+  Image,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {useUserContext} from '../contexts/UserContext';
 import {signOut} from '../lib/auth';
 import {createUser} from '../lib/users';
 import BorderedInput from './BorderedInput';
 import CustomButton from './CustomButton';
+import storage from '@react-native-firebase/storage';
 
 const SetupProfile = () => {
   const [displayName, setDisplayName] = React.useState();
@@ -14,15 +22,35 @@ const SetupProfile = () => {
   const navigation = useNavigation();
   const {setUser} = useUserContext();
   const [response, setResponse] = React.useState(null);
+  const [loading, setLoading] = useState(false);
 
   const {params} = useRoute();
   const {uid} = params || {};
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
+    setLoading(true);
+
+    let photoURL = null;
+
+    if (response) {
+      const asset = response.assets[0];
+      const extension = asset.fileName.split('.').pop(); //확장자 추출
+      const reference = storage().ref(`/profile/${uid}.${extension}`);
+
+      if (Platform.OS === 'android') {
+        await reference.putString(asset.base64, 'base64', {
+          contentType: asset.type,
+        });
+      } else {
+        await reference.putFile(asset.uri);
+      }
+      photoURL = response ? await reference.getDownloadURL() : null;
+    }
+
     const user = {
       id: uid,
       displayName,
-      photoURL: null,
+      photoURL,
     };
     createUser(user);
     setUser(user);
@@ -71,10 +99,14 @@ const SetupProfile = () => {
           onSubmitEditing={onSubmit}
           returnKeyType="next"
         />
-        <View style={styles.buttons}>
-          <CustomButton title="다음" onPress={onSubmit} hasMarginBottom />
-          <CustomButton title="취소" onPress={onCancel} theme="secondary" />
-        </View>
+        {loading ? (
+          <ActivityIndicator size={32} color="#6200ee" style={styles.spinner} />
+        ) : (
+          <View style={styles.buttons}>
+            <CustomButton title="다음" onPress={onSubmit} hasMarginBottom />
+            <CustomButton title="취소" onPress={onCancel} theme="secondary" />
+          </View>
+        )}
       </View>
     </View>
   );
@@ -100,6 +132,20 @@ const styles = StyleSheet.create({
   buttons: {
     marginTop: 48,
   },
+  spinner: {
+    marginTop: 48,
+    height: 104,
+  },
 });
 
 export default SetupProfile;
+
+// firebase storage 규칙 확인 / 초기설정은 read, write if false임 => 파일 업로드 안됨
+// rules_version = '2';
+// service firebase.storage {
+//   match /b/{bucket}/o {
+//     match /{allPaths=**} {
+//       allow read, write;
+//     }
+//   }
+// }
