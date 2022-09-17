@@ -22,6 +22,12 @@ const UploadScreen = () => {
   const navigation = useNavigation();
   const {user} = useUserContext();
 
+  const {res} = route.params || {};
+  const {width} = useWindowDimensions(); // 화면 가로크기
+  const animation = useRef(new Animated.Value(width)).current;
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const [description, setDescription] = useState('');
+
   const onSubmit = useCallback(async () => {
     navigation.pop();
     const asset = res.assets[0];
@@ -39,12 +45,6 @@ const UploadScreen = () => {
     await createPost({description, photoURL, user});
     // TODO : 포스트 목록 새로고침
   }, [res, user, description, navigation]);
-
-  const {res} = route.params || {};
-  const {width} = useWindowDimensions(); // 화면 가로크기
-  const animation = useRef(new Animated.Value(width)).current;
-  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
-  const [description, setDescription] = useState('');
 
   useEffect(() => {
     const didShow = Keyboard.addListener('keyboardDidShow', () =>
