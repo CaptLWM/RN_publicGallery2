@@ -62,6 +62,7 @@ const FeedScreen = () => {
       }
       refreshControl={
         <RefreshControl onRefresh={onRefresh} refreshing={refreshing} />
+        //onRefresh:dkfodptj dnlfh
       }
     />
   );
