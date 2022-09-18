@@ -15,6 +15,7 @@ import {createUser} from '../lib/users';
 import BorderedInput from './BorderedInput';
 import CustomButton from './CustomButton';
 import storage from '@react-native-firebase/storage';
+import Avatar from './Avatar';
 
 const SetupProfile = () => {
   const [displayName, setDisplayName] = React.useState();
@@ -82,14 +83,7 @@ const SetupProfile = () => {
   return (
     <View style={styles.block}>
       <Pressable onPress={onSelectImage}>
-        <Image
-          style={styles.circle}
-          source={
-            response
-              ? {uri: response?.assets[0]?.uri}
-              : require('../assets/user.png') // 기본이미지 설정
-          }
-        />
+        <Avatar source={response && {uri: response.uir}} size={128} />
       </Pressable>
       <View style={styles.form}>
         <BorderedInput
@@ -118,12 +112,6 @@ const styles = StyleSheet.create({
     marginTop: 24,
     paddingHorizontal: 16,
     width: '100%',
-  },
-  circle: {
-    backgroundColor: '#cdcdcd',
-    borderRadius: 64,
-    width: 128,
-    height: 128,
   },
   form: {
     marginTop: 16,
