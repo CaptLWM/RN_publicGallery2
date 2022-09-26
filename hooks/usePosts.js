@@ -1,5 +1,5 @@
 // getPosts 로직 재사용
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {getNewerPosts, getOlderPosts, getPosts, PAGE_SIZE} from '../lib/posts';
 
 export default function usePosts(userId) {
@@ -20,7 +20,7 @@ export default function usePosts(userId) {
     setPosts(posts.concat(olderPosts));
   };
 
-  const onRefresh = async () => {
+  const onRefresh = useCallback(async () => {
     if (!posts || posts.length === 0 || refreshing) {
       return;
     }
@@ -32,7 +32,7 @@ export default function usePosts(userId) {
       return;
     }
     setPosts(newerPosts.concat(posts));
-  };
+  }, [posts, userId, refreshing]); // 해당 값이 바뀔때만 onRefresh 호출
 
   useEffect(() => {
     getPosts({userId}).then(_posts => {
@@ -43,11 +43,19 @@ export default function usePosts(userId) {
     });
   }, [userId]);
 
+  const removePost = useCallback(
+    postId => {
+      setPosts(posts.filter(post => post.id !== postId));
+    },
+    [posts],
+  );
+
   return {
     posts,
     noMorePost,
     refreshing,
     onLoadMore,
     onRefresh,
+    removePost,
   };
 }

@@ -6,6 +6,7 @@ import {
 } from '@react-navigation/native';
 import {useState} from 'react';
 import {ActionSheetIOS, Platform} from 'react-native';
+import events from '../lib/events';
 import {removePost} from '../lib/posts';
 
 export default function usePostActions({id, description}) {
@@ -23,7 +24,7 @@ export default function usePostActions({id, description}) {
     if (route.name === 'Post') {
       navigation.pop();
     }
-    // TODO: 홈 및 프로필 화면의 목록 업데이트
+    events.emit('removePost', id);
   };
   const onPressMore = () => {
     if (Platform.OS === 'android') {
