@@ -27,19 +27,6 @@ const Profile = ({userId}) => {
     getUser(userId).then(setUser);
   }, [userId]);
 
-  useEffect(() => {
-    // 자신의 프로필을 보고 있을 때만 새 포스트 작성 후 새로고침
-    if (!isMyProfile) {
-      return;
-    }
-    events.addListener('refresh', onRefresh);
-    events.addListener('removePost', removePost);
-    return () => {
-      events.removeListener('refresh', onRefresh);
-      events.removeListener('removePost', removePost);
-    };
-  }, [isMyProfile, removePost, onRefresh]);
-
   if (!user || !posts) {
     return (
       <ActivityIndicator style={styles.spinner} size={32} color="#6200ee" />
