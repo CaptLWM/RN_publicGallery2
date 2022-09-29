@@ -1,18 +1,16 @@
 import React from 'react';
-import {Modal, Pressable, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Modal, View, Pressable, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const ActionSheetModal = ({visible, onClose, actions}) => {
+function ActionSheetModal({visible, onClose, actions}) {
   return (
     <Modal
       visible={visible}
-      transparent={true} // 배경 투명
-      animationType="fade" // slide(아래에서 위로), fade(서서히), none(기본값)
-      onRequestClose={onClose} //안드로이드에서 뒤로가기 버튼 했을때 호출되는 함수
-    >
+      transparent={true}
+      animationType="fade"
+      onRequestClose={onClose}>
       <Pressable style={styles.background} onPress={onClose}>
         <View style={styles.whiteBox}>
-          {/* Todo: props로 받아온 actions 배열 사용 */}
           {actions.map(action => (
             <Pressable
               style={styles.actionButton}
@@ -35,7 +33,7 @@ const ActionSheetModal = ({visible, onClose, actions}) => {
       </Pressable>
     </Modal>
   );
-};
+}
 
 const styles = StyleSheet.create({
   background: {
